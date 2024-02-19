@@ -1,3 +1,10 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+## Follow these steps to set database correctly:
+
+1. Create .env.test file (see .env-example, get the name of database from admin)
+2. Create .env.development file (see .env-example, get the name of database from admin)
+
+   Make sure to replace the placeholders with the actual database credentials provided by your administrator.
+
+## Run: npm install
