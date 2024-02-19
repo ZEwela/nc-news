@@ -152,6 +152,16 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("STATUS 200: returns an empty array when article do not have any comments", () => {
+    return request(app)
+      .get("/api/articles/8/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(0);
+      });
+  });
   test("STATUS 200: returned array is sorted by created_at in descending order by default", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -161,6 +171,26 @@ describe("GET /api/articles/:article_id/comments", () => {
 
         expect(comments.length).toBe(11);
         expect(comments).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("STATUS 400: returns an error when passed non-existent but valid article_id", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid article_id", () => {
+    return request(app)
+      .get("/api/articles/not-valid/comments")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
       });
   });
 });
