@@ -125,6 +125,17 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  test("STATUS 200: returned array of articles is sorted by created_at in descending order by default", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
 });
 
 describe("path not found", () => {
