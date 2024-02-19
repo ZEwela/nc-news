@@ -68,6 +68,18 @@ describe("GET /api", () => {
       .then((response) => {
         const apiEndpointsDescription = response.body.apiEndpointsDescription;
         expect(apiEndpointsDescription).toMatchObject(expectedObject);
+
+        for (const apiEndpoint in apiEndpointsDescription) {
+          expect(typeof apiEndpointsDescription[apiEndpoint].description).toBe(
+            "string"
+          );
+          expect(
+            Array.isArray(apiEndpointsDescription[apiEndpoint].queries)
+          ).toBe(true);
+          expect(
+            typeof apiEndpointsDescription[apiEndpoint].exampleResponse
+          ).toBe("object");
+        }
       });
   });
 });
