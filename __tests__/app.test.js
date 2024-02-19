@@ -29,6 +29,49 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("GET /api", () => {
+  test("Returns with an object describing all the available endpoints", () => {
+    const expectedObject = {
+      "GET /api": {
+        description:
+          "serves up a json representation of all the available endpoints of the api",
+      },
+      "GET /api/topics": {
+        description: "serves an array of all topics",
+        queries: [],
+        exampleResponse: {
+          topics: [{ slug: "football", description: "Footie!" }],
+        },
+      },
+      "GET /api/articles": {
+        description: "serves an array of all articles",
+        queries: ["author", "topic", "sort_by", "order"],
+        exampleResponse: {
+          articles: [
+            {
+              title: "Seafood substitutions are increasing",
+              topic: "cooking",
+              author: "weegembump",
+              body: "Text from the article..",
+              created_at: "2018-05-30T15:59:13.341Z",
+              votes: 0,
+              comment_count: 6,
+            },
+          ],
+        },
+      },
+    };
+
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        const apiEndpointsDescription = response.body.apiEndpointsDescription;
+        expect(apiEndpointsDescription).toMatchObject(expectedObject);
+      });
+  });
+});
+
 describe("path not found", () => {
   test("returns 404 for path that doesn't exist", () => {
     return request(app)
