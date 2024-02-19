@@ -1,11 +1,7 @@
-const fs = require("fs/promises");
+const endpointsDescription = require("../endpoints.json");
 
-function readEnpointsFile() {
-  const filePath = `${__dirname}/../endpoints.json`;
-
-  return fs.readFile(filePath, "utf-8").then((response) => {
-    return response;
-  });
+function requiresEnpointsFile() {
+  return endpointsDescription;
 }
 
-module.exports = { readEnpointsFile };
+module.exports = { requiresEnpointsFile };

@@ -4,7 +4,7 @@ const data = require("../db/data/test-data");
 const request = require("supertest");
 const app = require("../app");
 const { toBeSorted } = require("jest-sorted");
-const fs = require("fs/promises");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(data);
@@ -33,12 +33,7 @@ describe("GET /api/topics", () => {
 
 describe("GET /api", () => {
   test("Returns with an object describing all the available endpoints", () => {
-    let expectedOutput = null;
-    fs.readFile(`${__dirname}/../endpoints.json`, "utf-8").then(
-      (enpointsDescription) => {
-        expectedOutput = JSON.parse(enpointsDescription);
-      }
-    );
+    const expectedOutput = endpoints;
 
     return request(app)
       .get("/api")
