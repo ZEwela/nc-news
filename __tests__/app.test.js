@@ -152,6 +152,17 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("STATUS 200: returned array is sorted by created_at in descending order by default", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(11);
+        expect(comments).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
 });
 
 describe("path not found", () => {
