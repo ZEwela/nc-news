@@ -85,7 +85,7 @@ describe("GET /api", () => {
 });
 
 describe("GET /api/articles/:article_id", () => {
-  test("STATUS 200: responds with an correct article object", () => {
+  test("STATUS 200: responds with a correct article object", () => {
     const expectedOutput = {
       article_id: 1,
       title: "Living in the shadow of a great man",
@@ -103,6 +103,24 @@ describe("GET /api/articles/:article_id", () => {
       .then((response) => {
         const article = response.body.article;
         expect(article).toEqual(expectedOutput);
+      });
+  });
+  test("STATUS 400: returns an error when passed non-existent but valid article_id", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid  article_id", () => {
+    return request(app)
+      .get("/api/articles/not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Bad request.");
       });
   });
 });
