@@ -13,4 +13,17 @@ function selectCommentsByArticleId(articleId) {
     });
 }
 
-module.exports = { selectCommentsByArticleId };
+function insertCommentByArticleId(articleId, body) {
+  return db
+    .query(
+      `INSERT INTO comments (author, article_id, body) VALUES ($1, $2, $3) RETURNING *;`,
+      [body.username, articleId, body.body]
+    )
+    .then((response) => {
+      const comment = response.rows[0];
+
+      return comment;
+    });
+}
+
+module.exports = { selectCommentsByArticleId, insertCommentByArticleId };

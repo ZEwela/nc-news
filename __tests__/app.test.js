@@ -195,6 +195,77 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("POST /api/articles/:article_id/comments", () => {
+  test("STATUS 201: returns a new comment", () => {
+    const body = {
+      body: "A new comment!",
+      username: "butter_bridge",
+    };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const comment = response.body.comment;
+
+        expect(typeof comment.comment_id).toBe("number");
+        expect(typeof comment.body).toBe("string");
+        expect(typeof comment.article_id).toBe("number");
+        expect(typeof comment.author).toBe("string");
+        expect(typeof comment.votes).toBe("number");
+        expect(typeof comment.created_at).toBe("string");
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
+    const body = {
+      body: "A new comment!",
+      username: "butter_bridge",
+    };
+
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid article_id", () => {
+    const body = {
+      body: "A new comment!",
+      username: "butter_bridge",
+    };
+
+    return request(app)
+      .post("/api/articles/not-valid/comments")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when request body do not contain all needed values", () => {
+    const body = {
+      body: "A new comment!",
+    };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
 describe("path not found", () => {
   test("returns 404 for path that doesn't exist", () => {
     return request(app)
