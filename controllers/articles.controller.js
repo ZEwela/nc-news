@@ -1,6 +1,7 @@
 const {
   selectArticleById,
   selectAllArticles,
+  updateArticleById,
 } = require("../models/articles.model");
 
 function getArticleById(req, res, next) {
@@ -22,4 +23,22 @@ function getAllArticles(req, res, next) {
     .catch((err) => next(err));
 }
 
-module.exports = { getArticleById, getAllArticles };
+function patchArticleById(req, res, next) {
+  const articleId = req.params.article_id;
+  const { inc_votes } = req.body;
+
+  const promises = [
+    selectArticleById(articleId),
+    updateArticleById(articleId, inc_votes),
+  ];
+
+  Promise.all(promises)
+    .then((promisesResolution) => {
+      res.status(200).send({ article: promisesResolution[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
+module.exports = { getArticleById, getAllArticles, patchArticleById };
