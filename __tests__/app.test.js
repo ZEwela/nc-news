@@ -447,6 +447,24 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
+describe("GET /api/users", () => {
+  test("STATUS 200: returns an array of users with correct properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        const users = response.body.users;
+
+        expect(users.length).toBe(4);
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+});
+
 describe("path not found", () => {
   test("returns 404 for path that doesn't exist", () => {
     return request(app)
