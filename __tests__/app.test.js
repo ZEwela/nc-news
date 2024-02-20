@@ -131,6 +131,37 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ key: "created_at", descending: true });
       });
   });
+  test("STATUS 200: returned array of articles is filtered by topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(12);
+      });
+  });
+  test("STATUS 200: returned array of articles is filtered by topic query sorted by created_at by default", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("STATUS 200: returns an empty array if there are no articles with provided topic which exists in database", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(0);
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
