@@ -11,6 +11,7 @@ const {
   postCommentByArticleId,
   removeCommentById,
 } = require("./controllers/comments.controller");
+const { getAllUsers } = require("./controllers/users.controller");
 
 const app = express();
 app.use(express.json());
@@ -28,6 +29,8 @@ app.patch("/api/articles/:article_id", patchArticleById);
 app.get("/api/articles", getAllArticles);
 
 app.delete("/api/comments/:comment_id", removeCommentById);
+
+app.get("/api/users", getAllUsers);
 
 app.get("/api", getEndpointsDescription);
 
