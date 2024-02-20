@@ -266,6 +266,163 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+  test("STATUS 200: returns an updated article specified by article_id (increment votes by provided inc_votes in the body of request)", () => {
+    const newVote = 1;
+    const body = { inc_votes: newVote };
+
+    const expectedOutput = {
+      article_id: 4,
+      title: "Student SUES Mitch!",
+      topic: "mitch",
+      author: "rogersop",
+      body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+      created_at: "2020-05-06T01:14:00.000Z",
+      votes: 1,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .patch("/api/articles/4")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toEqual(expectedOutput);
+      });
+  });
+  test("STATUS 200: returns an updated article specified by article_id (decrement votes by provided inc_votes in the body of request)", () => {
+    const newVote = -100;
+    const body = { inc_votes: newVote };
+
+    const expectedOutput = {
+      article_id: 4,
+      title: "Student SUES Mitch!",
+      topic: "mitch",
+      author: "rogersop",
+      body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+      created_at: "2020-05-06T01:14:00.000Z",
+      votes: -100,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .patch("/api/articles/4")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toEqual(expectedOutput);
+      });
+  });
+  test("STATUS 200: returns an updated article specified by article_id (decrement votes by provided inc_votes in the body of request - multiple operations)", () => {
+    const newVote = -100;
+    const body = { inc_votes: newVote };
+
+    const expectedOutput = {
+      article_id: 4,
+      title: "Student SUES Mitch!",
+      topic: "mitch",
+      author: "rogersop",
+      body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+      created_at: "2020-05-06T01:14:00.000Z",
+      votes: -100,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    request(app)
+      .patch("/api/articles/4")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toEqual(expectedOutput);
+      });
+
+    const newVote2 = 99;
+    const body2 = { inc_votes: newVote2 };
+
+    const expectedOutput2 = {
+      article_id: 4,
+      title: "Student SUES Mitch!",
+      topic: "mitch",
+      author: "rogersop",
+      body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+      created_at: "2020-05-06T01:14:00.000Z",
+      votes: -1,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .patch("/api/articles/4")
+      .send(body2)
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toEqual(expectedOutput2);
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
+    const newVote = -100;
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid article_id", () => {
+    const newVote = -100;
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/articles/not-valid")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when request body do not contain needed value", () => {
+    const body = {};
+
+    return request(app)
+      .patch("/api/articles/2")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when request body contain wrong type of value", () => {
+    const newVote = "abc";
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/articles/2")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
 describe("path not found", () => {
   test("returns 404 for path that doesn't exist", () => {
     return request(app)
