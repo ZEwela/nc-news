@@ -78,13 +78,13 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toEqual(expectedOutput);
       });
   });
-  test("STATUS 400: returns an error when passed non-existent but valid article_id", () => {
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
     return request(app)
       .get("/api/articles/9999")
-      .expect(400)
+      .expect(404)
       .then((response) => {
         const error = response.body;
-        expect(error.msg).toBe("Bad request.");
+        expect(error.msg).toBe("Not found.");
       });
   });
   test("STATUS 400: returns an error when passed invalid  article_id", () => {
@@ -173,14 +173,14 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toBeSorted({ key: "created_at", descending: true });
       });
   });
-  test("STATUS 400: returns an error when passed non-existent but valid article_id", () => {
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
     return request(app)
       .get("/api/articles/9999/comments")
-      .expect(400)
+      .expect(404)
       .then((response) => {
         const error = response.body;
 
-        expect(error.msg).toBe("Bad request.");
+        expect(error.msg).toBe("Not found.");
       });
   });
   test("STATUS 400: returns an error when passed invalid article_id", () => {
