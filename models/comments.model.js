@@ -28,7 +28,7 @@ function insertCommentByArticleId(articleId, body) {
 
 function deleteCommentById(commentId) {
   return db
-    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING*;`, [
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *;`, [
       commentId,
     ])
     .then((response) => {
