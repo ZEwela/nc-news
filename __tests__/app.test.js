@@ -31,6 +31,29 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("GET /api/topics/:slug", () => {
+  test("STATUS 200: returns a topic object specified by slug", () => {
+    return request(app)
+      .get("/api/topics/cats")
+      .expect(200)
+      .then((response) => {
+        const topic = response.body.topic;
+
+        expect(topic.slug).toBe("cats");
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent slug ", () => {
+    return request(app)
+      .get("/api/topics/non-existent")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+});
+
 describe("GET /api", () => {
   test("Returns with an object describing all the available endpoints", () => {
     const expectedOutput = endpoints;
@@ -129,6 +152,47 @@ describe("GET /api/articles", () => {
 
         expect(articles.length).toBe(13);
         expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("STATUS 200: returned array of articles is filtered by topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(12);
+      });
+  });
+  test("STATUS 200: returned array of articles is filtered by topic query sorted by created_at by default", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("STATUS 200: returns an empty array if there are no articles with provided topic which exists in database", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("STATUS 404: returns an error if provided topic does not exist in database", () => {
+    return request(app)
+      .get("/api/articles?topic=non-existent")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
       });
   });
 });
