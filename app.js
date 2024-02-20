@@ -5,13 +5,19 @@ const {
   getArticleById,
   getAllArticles,
 } = require("./controllers/articles.controller");
-const { getCommentsByArticleId } = require("./controllers/comments.controller");
+const {
+  getCommentsByArticleId,
+  postCommentByArticleId,
+} = require("./controllers/comments.controller");
 
 const app = express();
+app.use(express.json());
 
 app.get("/api/topics", getAllTopics);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+
+app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 app.get("/api/articles/:article_id", getArticleById);
 
@@ -32,7 +38,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
+  if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad request." });
   } else {
     next(err);
