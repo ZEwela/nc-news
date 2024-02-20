@@ -317,7 +317,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(article).toEqual(expectedOutput);
       });
   });
-  test("STATUS 200: returns an updated article specified by article_id (decrement votes by provided inc_votes in the body of request - multiple operations)", () => {
+  test("STATUS 200: returns an updated article specified by article_id (changes votes by provided inc_votes in the body of request - multiple operations)", () => {
     const newVote = -100;
     const body = { inc_votes: newVote };
 
@@ -418,6 +418,30 @@ describe("PATCH /api/articles/:article_id", () => {
       .then((response) => {
         const error = response.body;
 
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("STATUS 204: returns correct status after deleting a comment", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid comment_id", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid  comment_id", () => {
+    return request(app)
+      .delete("/api/comments/not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
         expect(error.msg).toBe("Bad request.");
       });
   });
