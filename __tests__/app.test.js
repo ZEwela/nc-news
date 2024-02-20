@@ -78,13 +78,13 @@ describe("GET /api/articles/:article_id", () => {
         expect(article).toEqual(expectedOutput);
       });
   });
-  test("STATUS 400: returns an error when passed non-existent but valid article_id", () => {
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
     return request(app)
       .get("/api/articles/9999")
-      .expect(400)
+      .expect(404)
       .then((response) => {
         const error = response.body;
-        expect(error.msg).toBe("Bad request.");
+        expect(error.msg).toBe("Not found.");
       });
   });
   test("STATUS 400: returns an error when passed invalid  article_id", () => {
@@ -129,6 +129,68 @@ describe("GET /api/articles", () => {
 
         expect(articles.length).toBe(13);
         expect(articles).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("STATUS 200: returns an array of comments with correct properties", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(11);
+        comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
+        });
+      });
+  });
+  test("STATUS 200: returns an empty array when article do not have any comments", () => {
+    return request(app)
+      .get("/api/articles/8/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(0);
+      });
+  });
+  test("STATUS 200: returned array is sorted by created_at in descending order by default", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(11);
+        expect(comments).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid article_id", () => {
+    return request(app)
+      .get("/api/articles/not-valid/comments")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
       });
   });
 });

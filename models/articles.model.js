@@ -6,7 +6,7 @@ function selectArticleById(articleId) {
     .then((response) => {
       const article = response.rows[0];
       if (!article) {
-        return Promise.reject({ status: 400, msg: "Bad request." });
+        return Promise.reject({ status: 404, msg: "Not found." });
       }
       return article;
     });

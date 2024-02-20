@@ -5,10 +5,13 @@ const {
   getArticleById,
   getAllArticles,
 } = require("./controllers/articles.controller");
+const { getCommentsByArticleId } = require("./controllers/comments.controller");
 
 const app = express();
 
 app.get("/api/topics", getAllTopics);
+
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api/articles/:article_id", getArticleById);
 
