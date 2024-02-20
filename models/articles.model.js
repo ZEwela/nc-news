@@ -50,4 +50,8 @@ function updateArticleById(articleId, inc_votes) {
     });
 }
 
-module.exports = { selectArticleById, selectAllArticles, updateArticleById };
+module.exports = {
+  selectArticleById,
+  selectAllArticles,
+  updateArticleById,
+};

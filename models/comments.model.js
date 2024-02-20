@@ -26,4 +26,21 @@ function insertCommentByArticleId(articleId, body) {
     });
 }
 
-module.exports = { selectCommentsByArticleId, insertCommentByArticleId };
+function deleteCommentById(commentId) {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING*;`, [
+      commentId,
+    ])
+    .then((response) => {
+      const deletedComment = response.rows[0];
+      if (!deletedComment) {
+        return Promise.reject({ status: 404, msg: "Not found." });
+      }
+    });
+}
+
+module.exports = {
+  selectCommentsByArticleId,
+  insertCommentByArticleId,
+  deleteCommentById,
+};
