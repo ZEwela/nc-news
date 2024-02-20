@@ -24,6 +24,13 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "GET /api/topics/:slug": {
+    "description": "serves a topic by provided slug",
+    "queries": [],
+    "exampleResponse": {
+      "topic": { "slug": "football", "description": "Footie!" }
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles sorted by created_at in descending order by default",
     "queries": ["author", "topic", "sort_by", "order"],
