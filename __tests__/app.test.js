@@ -31,6 +31,29 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("GET /api/topics/:slug", () => {
+  test("STATUS 200: returns a topic object specified by slug", () => {
+    return request(app)
+      .get("/api/topics/cats")
+      .expect(200)
+      .then((response) => {
+        const topic = response.body.topic;
+
+        expect(topic.slug).toBe("cats");
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent slug ", () => {
+    return request(app)
+      .get("/api/topics/non-existent")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+});
+
 describe("GET /api", () => {
   test("Returns with an object describing all the available endpoints", () => {
     const expectedOutput = endpoints;
