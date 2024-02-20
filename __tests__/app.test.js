@@ -185,6 +185,16 @@ describe("GET /api/articles", () => {
         expect(articles.length).toBe(0);
       });
   });
+  test("STATUS 404: returns an error if provided topic does not exist in database", () => {
+    return request(app)
+      .get("/api/articles?topic=non-existent")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
