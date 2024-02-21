@@ -26,8 +26,6 @@ app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 app.delete("/api/comments/:comment_id", removeCommentById);
 
-app.get("/api/users", getAllUsers);
-
 app.use("/api", apiRouter);
 
 app.all("/*", (req, res, next) => {
