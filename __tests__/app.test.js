@@ -335,6 +335,39 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(typeof comment.created_at).toBe("string");
       });
   });
+  test("STATUS 201: returns a new comment and ignores unnecessary properties", () => {
+    const body = {
+      body: "A new comment!",
+      username: "butter_bridge",
+      toIgnore: "ignore me pls",
+    };
+
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const comment = response.body.comment;
+
+        expect(comment).not.toHaveProperty("toIgnore");
+      });
+  });
+  test("STATUS 404: returns a message Not Found when username does not exist in database", () => {
+    const body = {
+      body: "A new comment!",
+      username: "do-not-exist",
+    };
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
   test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
     const body = {
       body: "A new comment!",
