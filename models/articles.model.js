@@ -29,7 +29,24 @@ function selectArticleById(articleId) {
     });
 }
 
-function selectAllArticles(topic) {
+function selectAllArticles(topic, sort_by = "created_at", order = "desc") {
+  const sortLookup = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+    "body",
+  ];
+  const orderLookup = ["asc", "desc"];
+
+  if (!sortLookup.includes(sort_by) || !orderLookup.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Bad request." });
+  }
+
   const queryValues = [];
   let queryString = `SELECT 
     articles.article_id, 
@@ -52,7 +69,7 @@ function selectAllArticles(topic) {
 
   queryString += ` GROUP BY
   articles.article_id
-   ORDER BY articles.created_at DESC
+   ORDER BY articles.${sort_by} ${order}
     ;`;
   return db.query(queryString, queryValues).then((response) => {
     const articles = response.rows;
