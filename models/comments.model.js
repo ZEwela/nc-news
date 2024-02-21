@@ -13,11 +13,11 @@ function selectCommentsByArticleId(articleId) {
     });
 }
 
-function insertCommentByArticleId(articleId, body) {
+function insertCommentByArticleId(articleId, username, body) {
   return db
     .query(
       `INSERT INTO comments (author, article_id, body) VALUES ($1, $2, $3) RETURNING *;`,
-      [body.username, articleId, body.body]
+      [username, articleId, body]
     )
     .then((response) => {
       const comment = response.rows[0];

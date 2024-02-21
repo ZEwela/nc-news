@@ -4,6 +4,7 @@ const {
   insertCommentByArticleId,
   deleteCommentById,
 } = require("../models/comments.model");
+const { selectUserByUsername } = require("../models/users.model");
 
 function getCommentsByArticleId(req, res, next) {
   const articleId = req.params.article_id;
@@ -22,11 +23,12 @@ function getCommentsByArticleId(req, res, next) {
 
 function postCommentByArticleId(req, res, next) {
   const articleId = req.params.article_id;
-  const body = req.body;
+  const { username, body } = req.body;
 
   const promises = [
     selectArticleById(articleId),
-    insertCommentByArticleId(articleId, body),
+    insertCommentByArticleId(articleId, username, body),
+    selectUserByUsername(username),
   ];
 
   Promise.all(promises)
