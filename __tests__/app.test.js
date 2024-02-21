@@ -177,6 +177,17 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ key: "created_at", descending: false });
       });
   });
+  test("STATUS 200: returned array of articles is sorted by provided sort_by query and ordered by provided order query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author&order=asc")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSorted({ key: "author", descending: false });
+      });
+  });
   test("STATUS 200: returned array of articles is filtered by topic query", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
