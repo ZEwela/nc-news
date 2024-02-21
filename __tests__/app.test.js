@@ -24,8 +24,10 @@ describe("GET /api/topics", () => {
 
         expect(topics.length).toBe(3);
         topics.forEach((topic) => {
-          expect(typeof topic.slug).toBe("string");
-          expect(typeof topic.description).toBe("string");
+          expect(topic).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String),
+          });
         });
       });
   });
