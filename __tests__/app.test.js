@@ -155,6 +155,28 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ key: "created_at", descending: true });
       });
   });
+  test("STATUS 200: returned array of articles is sorted by provided sort_by query which sorts the articles by any valid column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSorted({ key: "title", descending: true });
+      });
+  });
+  test("STATUS 200: returned array of articles is ordered by provided order query", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSorted({ key: "created_at", descending: false });
+      });
+  });
   test("STATUS 200: returned array of articles is filtered by topic query", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
@@ -194,6 +216,26 @@ describe("GET /api/articles", () => {
         const error = response.body;
 
         expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error if provided sort_by is not valid", () => {
+    return request(app)
+      .get("/api/articles?sort_by=not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error if provided order is not valid", () => {
+    return request(app)
+      .get("/api/articles?order=not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
       });
   });
 });
