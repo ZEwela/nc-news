@@ -3,7 +3,7 @@ const {
   getAllTopics,
   getTopicBySlug,
 } = require("./controllers/topics.controller");
-const { getEndpointsDescription } = require("./controllers/api.controller");
+
 const {
   getArticleById,
   getAllArticles,
@@ -15,6 +15,7 @@ const {
   removeCommentById,
 } = require("./controllers/comments.controller");
 const { getAllUsers } = require("./controllers/users.controller");
+const apiRouter = require("./routes/api-router");
 
 const app = express();
 app.use(express.json());
@@ -37,7 +38,7 @@ app.delete("/api/comments/:comment_id", removeCommentById);
 
 app.get("/api/users", getAllUsers);
 
-app.get("/api", getEndpointsDescription);
+app.use("/api", apiRouter);
 
 app.all("/*", (req, res, next) => {
   res.status(404).send({ msg: "Path not found." });
