@@ -583,6 +583,30 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/:username", () => {
+  test("STATUS 200: returns an user object with correct properties", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then((response) => {
+        const user = response.body.user;
+
+        expect(typeof user.username).toBe("string");
+        expect(typeof user.name).toBe("string");
+        expect(typeof user.avatar_url).toBe("string");
+      });
+  });
+  test("STATUS 404: returns a Not found message when provided username does not exist in database", () => {
+    return request(app)
+      .get("/api/users/not-exist")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+});
+
 describe("path not found", () => {
   test("returns 404 for path that doesn't exist", () => {
     return request(app)
