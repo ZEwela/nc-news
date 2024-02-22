@@ -246,7 +246,7 @@ describe("GET /api/articles", () => {
         expect(articles.length).toBe(0);
       });
   });
-  test("STATUS 200: returns an array of articles with a 'total_count' property, reflecting the total number of articles excluding the pagination limit", () => {
+  test("STATUS 200: returns an array of articles and a 'total_count' property reflecting the total number of articles excluding the pagination limit", () => {
     return request(app)
       .get("/api/articles?limit=1")
       .expect(200)
@@ -256,7 +256,7 @@ describe("GET /api/articles", () => {
         expect(total_count).not.toBe(articles.length);
       });
   });
-  test("STATUS 200: returns an array of articles with a 'total_count' property, reflecting the total number of articles after applying filters and excluding the pagination limit", () => {
+  test("STATUS 200: returns an array of articles and a 'total_count' property reflecting the total number of articles after applying filters and excluding the pagination limit", () => {
     return request(app)
       .get("/api/articles?limit=1&topic=mitch")
       .expect(200)
