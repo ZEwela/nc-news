@@ -198,6 +198,7 @@ describe("GET /api/articles", () => {
         expect(articles.length).toBe(12);
       });
   });
+
   test("STATUS 200: returned array of articles is filtered by topic query sorted by created_at by default", () => {
     return request(app)
       .get("/api/articles?topic=mitch")
@@ -545,6 +546,115 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(400)
       .then((response) => {
         const error = response.body;
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("STATUS 200: returns an updated comment specified by comment_id (increment votes by provided inc_votes in the body of request)", () => {
+    const newVote = 1;
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const comment = response.body.comment;
+        expect(comment.votes).toBe(1);
+      });
+  });
+  test("STATUS 200: returns an updated comment specified by comment_id (decrement votes by provided inc_votes in the body of request)", () => {
+    const newVote = -1;
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const comment = response.body.comment;
+        expect(comment.votes).toBe(-1);
+      });
+  });
+  test("STATUS 200: returns an updated comment specified by comment_id (changes votes by provided inc_votes in the body of request - multiple operations)", () => {
+    const newVote = -1;
+    const body = { inc_votes: newVote };
+
+    request(app)
+      .patch("/api/comments/5")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const comment = response.body.comment;
+        expect(comment.votes).toBe(-1);
+      });
+
+    const newVote2 = 1;
+    const body2 = { inc_votes: newVote2 };
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(body2)
+      .expect(200)
+      .then((response) => {
+        const comment = response.body.comment;
+        expect(comment.votes).toBe(0);
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid comment_id", () => {
+    const newVote = -1;
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/comments/9999")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid comment_id", () => {
+    const newVote = -1;
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/comments/not-valid")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when request body does not contain needed value", () => {
+    const body = {};
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error when the request body contains a value of the wrong type", () => {
+    const newVote = "abc";
+    const body = { inc_votes: newVote };
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
         expect(error.msg).toBe("Bad request.");
       });
   });
