@@ -37,7 +37,6 @@ function selectAllArticles(
   p = 1
 ) {
   const offset = (p - 1) * limit;
-
   const sortLookup = [
     "article_id",
     "title",
@@ -55,7 +54,9 @@ function selectAllArticles(
     return Promise.reject({ status: 400, msg: "Bad request." });
   }
 
+  const queryStringBaseValues = [];
   const queryValues = [];
+
   let queryStringBase = `SELECT 
     articles.article_id, 
     articles.title, 
@@ -73,6 +74,7 @@ function selectAllArticles(
   if (topic) {
     queryStringBase += ` WHERE articles.topic = $1`;
     queryValues.push(topic);
+    queryStringBaseValues.push(topic);
   }
 
   queryStringBase += ` GROUP BY
@@ -87,26 +89,19 @@ function selectAllArticles(
     ` LIMIT $${queryValues.length - 1} OFFSET $${queryValues.length}
     ;`;
 
-  return db
-    .query(queryString, queryValues)
-    .then((response) => {
-      const articles = response.rows;
-      const queryStringBaseValues = [];
-      if (topic) {
-        queryStringBaseValues.push(topic);
-      }
-      const totalCountPromise = db.query(
-        queryStringBase + ";",
-        queryStringBaseValues
-      );
-      return Promise.all([articles, totalCountPromise]);
-    })
-    .then((responses) => {
-      return {
-        articles: responses[0],
-        total_count: responses[1].rowCount,
-      };
-    });
+  const totalCountPromise = db.query(
+    queryStringBase + ";",
+    queryStringBaseValues
+  );
+
+  const promises = [db.query(queryString, queryValues), totalCountPromise];
+
+  return Promise.all(promises).then((responses) => {
+    return {
+      articles: responses[0].rows,
+      total_count: responses[1].rowCount,
+    };
+  });
 }
 
 function updateArticleById(articleId, inc_votes) {
