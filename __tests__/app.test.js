@@ -252,6 +252,131 @@ describe("GET /api/articles", () => {
   });
 });
 
+describe("POST /api/articles", () => {
+  test("STATUS 201: returns a new article", () => {
+    const body = {
+      author: "butter_bridge",
+      title: "new title",
+      body: "new body",
+      topic: "cats",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const article = response.body.article;
+
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+          comment_count: expect.any(String),
+        });
+      });
+  });
+  test("STATUS 201: returns a new article with article_img_url property set by default if not provided in the request body", () => {
+    const body = {
+      author: "butter_bridge",
+      title: "new title",
+      body: "new body",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const article = response.body.article;
+
+        expect(article).toHaveProperty("article_img_url");
+      });
+  });
+  test("STATUS 201: returns a new article and ignores unnecessary properties", () => {
+    const body = {
+      author: "butter_bridge",
+      title: "new title",
+      body: "new body",
+      topic: "cats",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      toIgnore: "ignore me pls",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const article = response.body.article;
+
+        expect(article).not.toHaveProperty("toIgnore");
+      });
+  });
+  test("STATUS 404: returns a message Not Found when topic does not exist in database", () => {
+    const body = {
+      author: "butter_bridge",
+      title: "new title",
+      body: "new body",
+      topic: "not-exist",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 404: returns a message Not Found when author does not exist in database", () => {
+    const body = {
+      author: "not-exist",
+      title: "new title",
+      body: "new body",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when the request body does not contain all the required values", () => {
+    const body = {
+      author: "butter_bridge",
+      title: "new title",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id/comments", () => {
   test("STATUS 200: returns an array of comments with correct properties", () => {
     return request(app)
@@ -401,7 +526,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(error.msg).toBe("Bad request.");
       });
   });
-  test("STATUS 400: returns an error when request body do not contain all needed values", () => {
+  test("STATUS 400: Returns an error when the request body does not contain all the required values", () => {
     const body = {
       body: "A new comment!",
     };
