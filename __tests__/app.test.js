@@ -451,7 +451,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .then((response) => {
         const comments = response.body.comments;
 
-        expect(comments.length).toBe(11);
         comments.forEach((comment) => {
           expect(typeof comment.comment_id).toBe("number");
           expect(typeof comment.votes).toBe("number");
@@ -479,8 +478,67 @@ describe("GET /api/articles/:article_id/comments", () => {
       .then((response) => {
         const comments = response.body.comments;
 
-        expect(comments.length).toBe(11);
         expect(comments).toBeSorted({ key: "created_at", descending: true });
+      });
+  });
+  test("STATUS 200: returns an array of comments with a length limited by a 'limit' query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(5);
+      });
+  });
+  test("STATUS 200: returns an array of comments limited to a default length of 10", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBeLessThanOrEqual(10);
+      });
+  });
+  test("STATUS 200: returns an array of comments from 'page' spacified by p query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=2")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(1);
+      });
+  });
+  test("STATUS 200: returns an empty array if the provided 'p' query value refers to page that is bigger than accessible pages", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=3")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        expect(comments.length).toBe(0);
+      });
+  });
+  test("STATUS 400: returns a correct message if the provided 'limit' value is not valid", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns a correct message if the provided 'p' value is not valid", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
       });
   });
   test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
