@@ -130,8 +130,6 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(13);
-
         articles.forEach((article) => {
           expect(typeof article.article_id).toBe("number");
           expect(typeof article.title).toBe("string");
@@ -151,7 +149,6 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(13);
         expect(articles).toBeSorted({ key: "created_at", descending: true });
       });
   });
@@ -162,7 +159,6 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(13);
         expect(articles).toBeSorted({ key: "title", descending: true });
       });
   });
@@ -173,7 +169,6 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(13);
         expect(articles).toBeSorted({ key: "created_at", descending: false });
       });
   });
@@ -184,30 +179,22 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(13);
         expect(articles).toBeSorted({ key: "author", descending: false });
       });
   });
-  test("STATUS 200: returned array of articles is filtered by topic query", () => {
+  test("STATUS 200: returned array of articles is filtered by topic query and sorted by created_at by default", () => {
+    const topic = "mitch";
     return request(app)
-      .get("/api/articles?topic=mitch")
+      .get(`/api/articles?topic=${topic}`)
       .expect(200)
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(12);
-      });
-  });
-
-  test("STATUS 200: returned array of articles is filtered by topic query sorted by created_at by default", () => {
-    return request(app)
-      .get("/api/articles?topic=mitch")
-      .expect(200)
-      .then((response) => {
-        const articles = response.body.articles;
-
-        expect(articles.length).toBe(12);
         expect(articles).toBeSorted({ key: "created_at", descending: true });
+
+        articles.forEach((article) => {
+          expect(article.topic).toBe(topic);
+        });
       });
   });
   test("STATUS 200: returns an empty array if there are no articles with provided topic which exists in database", () => {
@@ -220,7 +207,86 @@ describe("GET /api/articles", () => {
         expect(articles.length).toBe(0);
       });
   });
-  test("STATUS 404: returns an error if provided topic does not exist in database", () => {
+  test("STATUS 200: returns an array of articles with a length limited by a 'limit' query", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(5);
+      });
+  });
+  test("STATUS 200: returns an array of articles limited to a default length of 10", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles.length).toBeLessThanOrEqual(10);
+      });
+  });
+  test("STATUS 200: returns an array of articles from 'page' spacified by p query (sorted by article_id in ascending order for test purpose)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id&order=asc&p=2")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+
+        expect(articles[0].article_id).toBe(11);
+      });
+  });
+  test("STATUS 200: returns an empty array if the provided 'p' query value refers to page that is bigger than accessible pages", () => {
+    return request(app)
+      .get("/api/articles?p=4")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("STATUS 200: returns an array of articles with a 'total_count' property, reflecting the total number of articles excluding the pagination limit", () => {
+    return request(app)
+      .get("/api/articles?limit=1")
+      .expect(200)
+      .then((response) => {
+        const { articles, total_count } = response.body;
+
+        expect(total_count).not.toBe(articles.length);
+      });
+  });
+  test("STATUS 200: returns an array of articles with a 'total_count' property, reflecting the total number of articles after applying filters and excluding the pagination limit", () => {
+    return request(app)
+      .get("/api/articles?limit=1&topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const { articles, total_count } = response.body;
+
+        expect(total_count).toBe(12);
+      });
+  });
+  test("STATUS 400: returns a correct message if the provided 'limit' is not valid", () => {
+    return request(app)
+      .get("/api/articles?limit=not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns a correct message if the provided 'p' value is not valid", () => {
+    return request(app)
+      .get("/api/articles?p=not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 404: returns an error if the provided 'topic' does not exist in database", () => {
     return request(app)
       .get("/api/articles?topic=non-existent")
       .expect(404)
@@ -230,7 +296,7 @@ describe("GET /api/articles", () => {
         expect(error.msg).toBe("Not found.");
       });
   });
-  test("STATUS 400: returns an error if provided sort_by is not valid", () => {
+  test("STATUS 400: returns an error if the provided 'sort_by' is not valid", () => {
     return request(app)
       .get("/api/articles?sort_by=not-valid")
       .expect(400)
@@ -240,7 +306,7 @@ describe("GET /api/articles", () => {
         expect(error.msg).toBe("Bad request.");
       });
   });
-  test("STATUS 400: returns an error if provided order is not valid", () => {
+  test("STATUS 400: returns an error if the provided 'order' is not valid", () => {
     return request(app)
       .get("/api/articles?order=not-valid")
       .expect(400)

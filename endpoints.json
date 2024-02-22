@@ -33,7 +33,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles sorted by created_at in descending order by default",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
