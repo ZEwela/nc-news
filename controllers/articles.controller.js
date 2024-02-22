@@ -19,9 +19,9 @@ function getArticleById(req, res, next) {
 }
 
 function getAllArticles(req, res, next) {
-  const { topic, sort_by, order } = req.query;
+  const { topic, sort_by, order, limit, p } = req.query;
 
-  const promises = [selectAllArticles(topic, sort_by, order)];
+  const promises = [selectAllArticles(topic, sort_by, order, limit, p)];
 
   if (topic) {
     promises.push(selectTopicBySlug(topic));
@@ -29,9 +29,11 @@ function getAllArticles(req, res, next) {
 
   Promise.all(promises)
     .then((promisesResolution) => {
-      res.status(200).send({ articles: promisesResolution[0] });
+      res.status(200).send(promisesResolution[0]);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      next(err);
+    });
 }
 
 function patchArticleById(req, res, next) {

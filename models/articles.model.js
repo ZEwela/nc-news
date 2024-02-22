@@ -29,7 +29,15 @@ function selectArticleById(articleId) {
     });
 }
 
-function selectAllArticles(topic, sort_by = "created_at", order = "desc") {
+function selectAllArticles(
+  topic,
+  sort_by = "created_at",
+  order = "desc",
+  limit = 10,
+  p = 1
+) {
+  const offset = (p - 1) * limit;
+
   const sortLookup = [
     "article_id",
     "title",
@@ -48,7 +56,7 @@ function selectAllArticles(topic, sort_by = "created_at", order = "desc") {
   }
 
   const queryValues = [];
-  let queryString = `SELECT 
+  let queryStringBase = `SELECT 
     articles.article_id, 
     articles.title, 
     articles.topic, 
@@ -63,18 +71,42 @@ function selectAllArticles(topic, sort_by = "created_at", order = "desc") {
     `;
 
   if (topic) {
-    queryString += ` WHERE articles.topic = $1`;
+    queryStringBase += ` WHERE articles.topic = $1`;
     queryValues.push(topic);
   }
 
-  queryString += ` GROUP BY
+  queryStringBase += ` GROUP BY
   articles.article_id
-   ORDER BY articles.${sort_by} ${order}
+   ORDER BY articles.${sort_by} ${order}`;
+
+  queryValues.push(limit);
+  queryValues.push(offset);
+
+  let queryString =
+    queryStringBase +
+    ` LIMIT $${queryValues.length - 1} OFFSET $${queryValues.length}
     ;`;
-  return db.query(queryString, queryValues).then((response) => {
-    const articles = response.rows;
-    return articles;
-  });
+
+  return db
+    .query(queryString, queryValues)
+    .then((response) => {
+      const articles = response.rows;
+      const queryStringBaseValues = [];
+      if (topic) {
+        queryStringBaseValues.push(topic);
+      }
+      const totalCountPromise = db.query(
+        queryStringBase + ";",
+        queryStringBaseValues
+      );
+      return Promise.all([articles, totalCountPromise]);
+    })
+    .then((responses) => {
+      return {
+        articles: responses[0],
+        total_count: responses[1].rowCount,
+      };
+    });
 }
 
 function updateArticleById(articleId, inc_votes) {

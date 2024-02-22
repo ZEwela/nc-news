@@ -32,8 +32,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles sorted by created_at in descending order by default",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an object with an articles property (articles sorted by created_at in descending order by default) and a total_count property reflecting the total number of articles after applying filters and excluding the pagination limit",
+    "queries": ["topic", "sort_by", "order , p, limit"],
     "exampleResponse": {
       "articles": [
         {
@@ -56,7 +56,8 @@
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           "comment_count": "1"
         }
-      ]
+      ],
+      "total_count": 13
     }
   },
   "POST /api/articles": {
