@@ -3,6 +3,7 @@ const {
   selectCommentsByArticleId,
   insertCommentByArticleId,
   deleteCommentById,
+  updateCommentById,
 } = require("../models/comments.model");
 const { selectUserByUsername } = require("../models/users.model");
 
@@ -49,8 +50,20 @@ function removeCommentById(req, res, next) {
       next(err);
     });
 }
+
+function patchCommentById(req, res, next) {
+  const commentId = req.params.comment_id;
+  const { inc_votes } = req.body;
+
+  updateCommentById(commentId, inc_votes)
+    .then((comment) => {
+      res.status(200).send({ comment });
+    })
+    .catch((err) => next(err));
+}
 module.exports = {
   getCommentsByArticleId,
   postCommentByArticleId,
   removeCommentById,
+  patchCommentById,
 };
