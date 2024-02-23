@@ -201,14 +201,16 @@ describe("GET /api/articles", () => {
         const articles = response.body.articles;
 
         articles.forEach((article) => {
-          expect(typeof article.article_id).toBe("number");
-          expect(typeof article.title).toBe("string");
-          expect(typeof article.topic).toBe("string");
-          expect(typeof article.author).toBe("string");
-          expect(typeof article.created_at).toBe("string");
-          expect(typeof article.votes).toBe("number");
-          expect(typeof article.article_img_url).toBe("string");
-          expect(typeof article.comment_count).toBe("string");
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          });
         });
       });
   });
@@ -522,12 +524,14 @@ describe("GET /api/articles/:article_id/comments", () => {
         const comments = response.body.comments;
 
         comments.forEach((comment) => {
-          expect(typeof comment.comment_id).toBe("number");
-          expect(typeof comment.votes).toBe("number");
-          expect(typeof comment.created_at).toBe("string");
-          expect(typeof comment.author).toBe("string");
-          expect(typeof comment.body).toBe("string");
-          expect(typeof comment.article_id).toBe("number");
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
         });
       });
   });
@@ -647,12 +651,14 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then((response) => {
         const comment = response.body.comment;
 
-        expect(typeof comment.comment_id).toBe("number");
-        expect(typeof comment.body).toBe("string");
-        expect(typeof comment.article_id).toBe("number");
-        expect(typeof comment.author).toBe("string");
-        expect(typeof comment.votes).toBe("number");
-        expect(typeof comment.created_at).toBe("string");
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          article_id: expect.any(Number),
+        });
       });
   });
   test("STATUS 201: returns a new comment and ignores unnecessary properties", () => {
@@ -1053,9 +1059,11 @@ describe("GET /api/users", () => {
 
         expect(users.length).toBe(4);
         users.forEach((user) => {
-          expect(typeof user.username).toBe("string");
-          expect(typeof user.name).toBe("string");
-          expect(typeof user.avatar_url).toBe("string");
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
         });
       });
   });
@@ -1069,9 +1077,11 @@ describe("GET /api/users/:username", () => {
       .then((response) => {
         const user = response.body.user;
 
-        expect(typeof user.username).toBe("string");
-        expect(typeof user.name).toBe("string");
-        expect(typeof user.avatar_url).toBe("string");
+        expect(user).toMatchObject({
+          username: expect.any(String),
+          name: expect.any(String),
+          avatar_url: expect.any(String),
+        });
       });
   });
   test("STATUS 404: returns a Not found message when provided username does not exist in database", () => {
