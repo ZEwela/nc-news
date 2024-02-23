@@ -100,6 +100,11 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "serves a correct status after deleting an article)",
+    "queries": [],
+    "exampleResponse": {}
+  },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments for an article specified by article_id by default sorted by created_at in descending order",
     "queries": ["p", "limit"],

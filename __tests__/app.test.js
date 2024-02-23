@@ -846,6 +846,47 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("DELETE /api/articles/:article_id", () => {
+  test("STATUS 204: returns correct status after deleting an article", () => {
+    return request(app).delete("/api/articles/2").expect(204);
+  });
+  test("STATUS 204: deletes article and its comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+        expect(comments.length).toBeGreaterThanOrEqual(1);
+        return request(app).delete("/api/articles/1").expect(204);
+      })
+      .then(() => {
+        return request(app).get("/api/articles/1/comments").expect(404);
+      })
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
+    return request(app)
+      .delete("/api/articles/9999")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid  article_id", () => {
+    return request(app)
+      .delete("/api/articles/not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("STATUS 204: returns correct status after deleting a comment", () => {
     return request(app).delete("/api/comments/1").expect(204);
