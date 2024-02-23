@@ -59,9 +59,18 @@ function updateCommentById(commentId, inc_votes) {
     });
 }
 
+function selectAllComments() {
+  return db.query(`SELECT * FROM comments;`).then((response) => {
+    let comments = response.rows;
+
+    return comments;
+  });
+}
+
 module.exports = {
   selectCommentsByArticleId,
   insertCommentByArticleId,
   deleteCommentById,
   updateCommentById,
+  selectAllComments,
 };
