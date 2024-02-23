@@ -24,6 +24,13 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "POST /api/topics": {
+    "description": "serves a new topic",
+    "queries": [],
+    "exampleResponse": {
+      "topic": { "slug": "football", "description": "Footie!" }
+    }
+  },
   "GET /api/topics/:slug": {
     "description": "serves a topic by provided slug",
     "queries": [],
