@@ -887,6 +887,28 @@ describe("DELETE /api/articles/:article_id", () => {
   });
 });
 
+describe("GET /api/comments", () => {
+  test("STATUS 200: returns an array of comments with correct properties", () => {
+    return request(app)
+      .get("/api/comments")
+      .expect(200)
+      .then((response) => {
+        const comments = response.body.comments;
+
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("STATUS 204: returns correct status after deleting a comment", () => {
     return request(app).delete("/api/comments/1").expect(204);
