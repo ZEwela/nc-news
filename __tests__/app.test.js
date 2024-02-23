@@ -850,21 +850,22 @@ describe("DELETE /api/articles/:article_id", () => {
   test("STATUS 204: returns correct status after deleting an article", () => {
     return request(app).delete("/api/articles/2").expect(204);
   });
-  test("STATUS 204: deletes article and its comments", () => {
+  test("STATUS 204: deletes the article and its comments", () => {
+    let commentsLengthBeforeDeleting = null;
     return request(app)
-      .get("/api/articles/1/comments")
+      .get("/api/comments")
       .expect(200)
       .then((response) => {
         const comments = response.body.comments;
-        expect(comments.length).toBeGreaterThanOrEqual(1);
+        commentsLengthBeforeDeleting = comments.length;
         return request(app).delete("/api/articles/1").expect(204);
       })
       .then(() => {
-        return request(app).get("/api/articles/1/comments").expect(404);
+        return request(app).get("/api/comments").expect(200);
       })
       .then((response) => {
-        const error = response.body;
-        expect(error.msg).toBe("Not found.");
+        const comments = response.body.comments;
+        expect(comments.length).toBeLessThan(commentsLengthBeforeDeleting);
       });
   });
   test("STATUS 404: returns an error when passed non-existent but valid article_id", () => {
