@@ -33,6 +33,76 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", () => {
+  test("STATUS 201: returns a new topic", () => {
+    const body = {
+      slug: "sun",
+      description: "the ball of fire in the sky",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const topic = response.body.topic;
+
+        expect(topic).toMatchObject({
+          slug: expect.any(String),
+          description: expect.any(String),
+        });
+      });
+  });
+  test("STATUS 201: returns a new topic and ignores unnecessary properties", () => {
+    const body = {
+      slug: "sun",
+      description: "the ball of fire in the sky",
+      toIgnore: "ignore me pls",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(body)
+      .expect(201)
+      .then((response) => {
+        const topic = response.body.topic;
+
+        expect(topic).not.toHaveProperty("toIgnore");
+      });
+  });
+  test("STATUS 409: returns a correct message when topic with provided slug already exists in the database", () => {
+    const body = {
+      description: "The man, the Mitch, the legend",
+      slug: "mitch",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(body)
+      .expect(409)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Already exists.");
+      });
+  });
+  test("STATUS 400: returns an error when the request body does not contain all the required values", () => {
+    const body = {
+      description: "the ball of fire in the sky",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
+
 describe("GET /api/topics/:slug", () => {
   test("STATUS 200: returns a topic object specified by slug", () => {
     return request(app)

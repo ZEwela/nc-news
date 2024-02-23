@@ -1,6 +1,7 @@
 const {
   selectAllTopics,
   selectTopicBySlug,
+  insertTopic,
 } = require("../models/topics.model");
 
 function getAllTopics(req, res, next) {
@@ -20,4 +21,13 @@ function getTopicBySlug(req, res, next) {
     .catch((err) => next(err));
 }
 
-module.exports = { getAllTopics, getTopicBySlug };
+function postTopic(req, res, next) {
+  const body = req.body;
+  insertTopic(body)
+    .then((topic) => {
+      res.status(201).send({ topic });
+    })
+    .catch((err) => next(err));
+}
+
+module.exports = { getAllTopics, getTopicBySlug, postTopic };

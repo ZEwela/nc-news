@@ -18,4 +18,17 @@ function selectTopicBySlug(slug) {
     });
 }
 
-module.exports = { selectAllTopics, selectTopicBySlug };
+function insertTopic({ slug, description }) {
+  return db
+    .query(
+      `INSERT INTO topics (slug, description) VALUES ($1, $2) RETURNING *;`,
+      [slug, description]
+    )
+    .then((response) => {
+      const topic = response.rows[0];
+
+      return topic;
+    });
+}
+
+module.exports = { selectAllTopics, selectTopicBySlug, insertTopic };
