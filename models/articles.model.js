@@ -143,10 +143,28 @@ function insertArticle({ author, title, body, topic, article_img_url }) {
     return article;
   });
 }
+function deleteArticleById(articleId) {
+  return db
+    .query(`DELETE FROM comments WHERE article_id = $1;`, [articleId])
+    .then(() => {
+      return db.query(
+        `DELETE FROM articles WHERE article_id = $1 RETURNING *;`,
+        [articleId]
+      );
+    })
+    .then((response) => {
+      const deletedArticle = response.rows[0];
+
+      if (!deletedArticle) {
+        return Promise.reject({ status: 404, msg: "Not found." });
+      }
+    });
+}
 
 module.exports = {
   selectArticleById,
   selectAllArticles,
   updateArticleById,
   insertArticle,
+  deleteArticleById,
 };

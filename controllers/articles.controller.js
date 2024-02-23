@@ -3,6 +3,7 @@ const {
   selectAllArticles,
   updateArticleById,
   insertArticle,
+  deleteArticleById,
 } = require("../models/articles.model");
 const { selectTopicBySlug } = require("../models/topics.model");
 const { selectUserByUsername } = require("../models/users.model");
@@ -71,9 +72,22 @@ function postArticle(req, res, next) {
     });
 }
 
+function removeArticleById(req, res, next) {
+  const articleId = req.params.article_id;
+
+  deleteArticleById(articleId)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getArticleById,
   getAllArticles,
   patchArticleById,
   postArticle,
+  removeArticleById,
 };
