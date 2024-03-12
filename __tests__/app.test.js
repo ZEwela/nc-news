@@ -254,6 +254,17 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ key: "author", descending: false });
       });
   });
+  test("STATUS 200: returned array of articles is sorted by provided sort_by (comment_count) query and ordered by provided order query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count&order=asc")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body.articles;
+        console.log(articles)
+
+        expect(articles).toBeSorted({ key: "comment_count", coerce: true, descending: false });
+      });
+  });
   test("STATUS 200: returned array of articles is filtered by topic query and sorted by created_at by default", () => {
     const topic = "mitch";
     return request(app)

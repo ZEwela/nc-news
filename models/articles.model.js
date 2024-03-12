@@ -78,9 +78,13 @@ function selectAllArticles(
   }
 
   queryStringBase += ` GROUP BY
-  articles.article_id
-   ORDER BY articles.${sort_by} ${order}`;
+  articles.article_id`
 
+  if(sort_by === "comment_count") {
+    queryStringBase += ` ORDER BY comment_count ${order}`;
+  } else {
+    queryStringBase += ` ORDER BY articles.${sort_by} ${order}`;
+  }
   queryValues.push(limit);
   queryValues.push(offset);
 
