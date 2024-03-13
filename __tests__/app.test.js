@@ -260,8 +260,6 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((response) => {
         const articles = response.body.articles;
-        console.log(articles)
-
         expect(articles).toBeSorted({ key: "comment_count", coerce: true, descending: false });
       });
   });
