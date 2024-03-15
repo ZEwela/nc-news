@@ -34,7 +34,8 @@ function selectAllArticles(
   sort_by = "created_at",
   order = "desc",
   limit = 10,
-  p = 1
+  p = 1,
+  author
 ) {
   const offset = (p - 1) * limit;
   const sortLookup = [
@@ -71,11 +72,16 @@ function selectAllArticles(
     ON articles.article_id = comments.article_id
     `;
 
-  if (topic) {
-    queryStringBase += ` WHERE articles.topic = $1`;
-    queryValues.push(topic);
-    queryStringBaseValues.push(topic);
-  }
+    if (topic) {
+      queryStringBase += ` WHERE articles.topic = $1`;
+      queryValues.push(topic);
+      queryStringBaseValues.push(topic);
+    }
+     if (author) {
+       queryValues.push(author)
+       queryStringBaseValues.push(author);
+       queryStringBase += `${topic ? ' AND' : 'WHERE'} articles.author = $${queryValues.length}`;
+    }
 
   queryStringBase += ` GROUP BY
   articles.article_id`
@@ -105,7 +111,7 @@ function selectAllArticles(
       articles: responses[0].rows,
       total_count: responses[1].rowCount,
     };
-  });
+  })
 }
 
 function updateArticleById(articleId, inc_votes) {

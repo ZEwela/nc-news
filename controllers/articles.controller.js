@@ -20,12 +20,16 @@ function getArticleById(req, res, next) {
 }
 
 function getAllArticles(req, res, next) {
-  const { topic, sort_by, order, limit, p } = req.query;
+  const { author, topic, sort_by, order, limit, p } = req.query;
 
-  const promises = [selectAllArticles(topic, sort_by, order, limit, p)];
+  const promises = [selectAllArticles(topic, sort_by, order, limit, p, author)];
 
   if (topic) {
     promises.push(selectTopicBySlug(topic));
+  }
+
+  if(author) {
+    promises.push(selectUserByUsername(author))
   }
 
   Promise.all(promises)

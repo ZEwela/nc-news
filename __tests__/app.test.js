@@ -280,23 +280,58 @@ describe("GET /api/articles", () => {
   });
   test("STATUS 200: returns an empty array if there are no articles with provided topic which exists in database", () => {
     return request(app)
-      .get("/api/articles?topic=paper")
+    .get("/api/articles?topic=paper")
+    .expect(200)
+    .then((response) => {
+      const articles = response.body.articles;
+      
+      expect(articles.length).toBe(0);
+    });
+  });
+  test("STATUS 200: returned array of articles is filtered by author query and sorted by created_at by default", () => {
+    const author = "butter_bridge";
+    return request(app)
+      .get(`/api/articles?author=${author}`)
       .expect(200)
       .then((response) => {
         const articles = response.body.articles;
 
-        expect(articles.length).toBe(0);
+        expect(articles).toBeSorted({ key: "created_at", descending: true });
+
+        articles.forEach((article) => {
+          expect(article.author).toBe(author);
+        });
       });
+  });
+  test("STATUS 404: returns an error if the provided 'author' does not exist in database", () => {
+    return request(app)
+      .get("/api/articles?author=non-existent")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Not found.");
+      });
+  });
+  test("STATUS 200: returns an empty array if there are no articles with provided author which exists in database", () => {
+    return request(app)
+    .get("/api/articles?author=lurker")
+    .expect(200)
+    .then((response) => {
+      const articles = response.body.articles;
+      
+      expect(articles.length).toBe(0);
+    });
   });
   test("STATUS 200: returns an array of articles with a length limited by a 'limit' query", () => {
     return request(app)
-      .get("/api/articles?limit=5")
-      .expect(200)
-      .then((response) => {
-        const articles = response.body.articles;
-
-        expect(articles.length).toBe(5);
-      });
+    .get("/api/articles?limit=5")
+    .expect(200)
+    .then((response) => {
+      const articles = response.body.articles;
+      
+      expect(articles.length).toBe(5);
+    });
   });
   test("STATUS 200: returns an array of articles limited to a default length of 10", () => {
     return request(app)
