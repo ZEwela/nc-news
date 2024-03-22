@@ -2,7 +2,7 @@
 
 ## Hosted Version
 
-[Link to Hosted Version](https://nc-news-kpcd.onrender.com)
+[Link to Hosted Version](https://nc-news-kpcd.onrender.com/api)
 
 ## Project Summary
 
